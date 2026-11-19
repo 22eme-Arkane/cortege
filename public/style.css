@@ -1187,3 +1187,9 @@ body.medic.md-nosig .leaflet-reports-pane { display: none; }
 .aff-ban { color: var(--fdo-strong); font-size: 12px; font-weight: 800; }
 .list li button.affiche { display: grid; grid-template-columns: 34% 1fr; cursor: pointer; }
 #sheetAgenda .ag-list li.ag-day { display: none !important; }
+/* En-tête : « Cortège » et son logo, centrés ; plus de sous-titre */
+.topbar .brand { position: absolute; left: 50%; transform: translateX(-50%); gap: 8px; }
+.topbar .brand .event { display: none; }
+.topbar .logo-img { width: 34px; height: 34px; border-radius: 9px; filter: none; }
+.topbar .brand .name { font-family: var(--font-display); font-size: 26px; line-height: 1; letter-spacing: .02em; text-transform: uppercase; }
+.topbar { min-height: calc(env(safe-area-inset-top, 0px) + 58px); justify-content: flex-end; }
