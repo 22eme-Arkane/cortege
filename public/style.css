@@ -1193,3 +1193,5 @@ body.medic.md-nosig .leaflet-reports-pane { display: none; }
 .topbar .logo-img { width: 34px; height: 34px; border-radius: 9px; filter: none; }
 .topbar .brand .name { font-family: var(--font-display); font-size: 26px; line-height: 1; letter-spacing: .02em; text-transform: uppercase; }
 .topbar { min-height: calc(env(safe-area-inset-top, 0px) + 58px); justify-content: flex-end; }
+/* En-tête : « Cortège » seul, sans logo (emplacement du logo à décider) */
+.topbar .logo-img { display: none; }
