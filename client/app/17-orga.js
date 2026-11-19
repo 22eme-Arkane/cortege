@@ -19,7 +19,7 @@
     $('#btnOrga').hidden = !o;
     $('#orgaChip').hidden = !o;
     if (o) { $('#orgaChip').textContent = o.admin ? 'ADMIN' : o.trial ? t('ORGA · essai') : 'ORGA'; $('#orgaChip').title = o.label; }
-    $('#btnPropose').textContent = t(o ? 'Publier une manif ou un blocus' : 'Proposer un blocus ou une manif');
+    $('#btnPropose').textContent = '＋ ' + t(o ? 'Publier une manif ou un blocus' : 'Annoncer une manif');
     $('#agFine').hidden = !!o;
     if (orgaMod) orgaMod.onOrga(o);
   }

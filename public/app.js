@@ -1402,14 +1402,15 @@
   $('#poiClose').onclick = () => closeSheets();
 
   // ---- Signaler ----
-  const sheets = ['#sheetLayers', '#sheetFeed', '#sheetPoi', '#sheetNews', '#sheetEmbed', '#sheetIdeas', '#sheetJoin', '#sheetReport', '#sheetList', '#sheetInfo', '#sheetSearch', '#sheetShare', '#sheetRights', '#sheetOrga', '#sheetAgenda', '#sheetEvent', '#sheetSos', '#sheetPrep', '#sheetQueue', '#sheetNotif', '#sheetOrd', '#sheetOrdNew', '#sheetMedic', '#sheetMedicHelp', '#sheetRec', '#sheetRecover', '#sheetSon', '#sheetWelcome'];
+  const sheets = ['#sheetLayers', '#sheetFeed', '#sheetPoi', '#sheetNews', '#sheetEmbed', '#sheetIdeas', '#sheetJoin', '#sheetReport', '#sheetList', '#sheetInfo', '#sheetSearch', '#sheetShare', '#sheetRights', '#sheetOrga', '#sheetAgenda', '#sheetEvent', '#sheetSos', '#sheetPrep', '#sheetQueue', '#sheetNotif', '#sheetOrd', '#sheetOrdNew', '#sheetMedic', '#sheetMedicHelp', '#sheetRec', '#sheetRecover', '#sheetSon', '#sheetWelcome', '#sheetQuick'];
   // Certaines fiches n'arrivent dans la page qu'avec leur partie chargée à la demande (espace orga, idées, enregistreur) : voir addSheet
   const sheetOpen = s => { const x = $(s); return !!x && !x.hidden; };
   const closeSheets = () => sheets.forEach(s => { const x = $(s); if (x) x.hidden = true; });
   // Fond assombri derrière les feuilles : un appui dessus ferme la feuille (sauf « Signaler », qui a besoin de la carte)
   const backdrop = $('#backdrop');
   // Pages des onglets (Infos, Droits, Plus) : plein écran au-dessus de la barre, sans fond assombri
-  const PAGES = { tabInfos: '#sheetFeed', tabRights: '#sheetRights', tabMore: '#sheetInfo' };
+  // Refonte : Agenda et Réglages sont des pages ; Infos et Droits n'ont plus d'onglet (leur contenu est réparti, voir 35-refonte.js)
+  const PAGES = { tabAgenda: '#sheetAgenda', tabMore: '#sheetInfo' };
   const isPage = s => Object.values(PAGES).includes(s);
   function syncTabs() {
     const open = Object.entries(PAGES).find(([, s]) => !$(s).hidden);
@@ -1855,12 +1856,14 @@
     if (wasOpen) return; // deuxième appui sur l'onglet : retour à la carte
     if (sel === '#sheetFeed') renderFeed();
     if (sel === '#sheetRights') renderLegal();
+    if (sel === '#sheetAgenda') { renderFeed(); renderAgenda(); }
     $(sel).hidden = false; $(sel).scrollTop = 0;
   }
   $('#tabMap').onclick = () => { closeReport(); closeSheets(); };
   $('#tabInfos').onclick = () => openPage('#sheetFeed');
   $('#tabRights').onclick = () => openPage('#sheetRights');
   $('#tabMore').onclick = () => openPage('#sheetInfo');
+  $('#tabAgenda').onclick = () => openPage('#sheetAgenda');
   $('#fdClose').onclick = () => closeSheets();
   $('#siClose').onclick = () => closeSheets();
 
@@ -2184,7 +2187,7 @@
     $('#btnOrga').hidden = !o;
     $('#orgaChip').hidden = !o;
     if (o) { $('#orgaChip').textContent = o.admin ? 'ADMIN' : o.trial ? t('ORGA · essai') : 'ORGA'; $('#orgaChip').title = o.label; }
-    $('#btnPropose').textContent = t(o ? 'Publier une manif ou un blocus' : 'Proposer un blocus ou une manif');
+    $('#btnPropose').textContent = '＋ ' + t(o ? 'Publier une manif ou un blocus' : 'Annoncer une manif');
     $('#agFine').hidden = !!o;
     if (orgaMod) orgaMod.onOrga(o);
   }
@@ -2278,8 +2281,10 @@
   const fmtHour = x => new Date(x).toLocaleTimeString(I18N.locale, { hour: '2-digit', minute: '2-digit' });
   // Sur la carte : les événements du moment (de 12 h avant à 10 h après le départ), plus celui choisi dans l'agenda
   // Masqués par le filtre « Agenda » sauf celui que la personne vient d'ouvrir dans l'agenda
-  const evOnMap = e => e.id === selectedEv || (!evHidden && map.getZoom() >= 9 && e.start - 12 * 60 * MIN < Date.now() && e.start + 10 * 60 * MIN > Date.now());
-  map.on('zoomend', () => { const z = map.getZoom() >= 9; if (z !== evOnMap.z) { evOnMap.z = z; renderEvents(); } });
+  // Refonte : visibles dès 7 jours avant le départ (et jusqu'à 6 h après), à partir du zoom région
+  const EV_AHEAD = 7 * 24 * 60 * MIN, EV_ZOOM = 6;
+  const evOnMap = e => e.id === selectedEv || (!evHidden && map.getZoom() >= EV_ZOOM && e.start - EV_AHEAD < Date.now() && e.start + 6 * 60 * MIN > Date.now());
+  map.on('zoomend', () => { const z = map.getZoom() >= EV_ZOOM; if (z !== evOnMap.z) { evOnMap.z = z; renderEvents(); } });
   function evPopup(e) {
     const ty = EVT[e.type] || { glyph: '📍', label: '' };
     const root = el('div');
@@ -2313,7 +2318,7 @@
         if (e.end) L.marker(e.route[e.route.length - 1], { icon: L.divIcon({ className: '', iconSize: [30, 30], html: '<div class="ev-end">🏁</div>' }), title: t('Dispersion prévue'), keyboard: false })
           .bindPopup(() => el('div', {}, t('Dispersion prévue : {title}', { title: e.title }))).addTo(evLayer);
       }
-      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin">${ty.glyph}</div>` }),
+      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin">${ty.glyph}${e.start - Date.now() > 12 * 60 * MIN ? `<span class="ev-date">${new Date(e.start).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short' })}</span>` : ''}</div>` }),
         title: e.title, zIndexOffset: 500 }).bindPopup(() => evPopup(e)).addTo(evLayer);
       evMarkers.set(e.id, m);
     }
@@ -2327,11 +2332,13 @@
     const scope = document.querySelector('input[name="agScope"]:checked').value;
     const c = map.getCenter(), ref = me || [c.lat, c.lng], now = Date.now();
     let list = evCache.e.filter(e => e.start + 3 * 60 * MIN > now);
+    renderCal(list);
+    if (agSel) list = list.filter(e => dayKey(e.start) === agSel);
     if (scope === 'near') list = list.filter(e => dist(ref, [e.lat, e.lng]) <= 50_000);
     list.sort((a, b) => a.start - b.start);
     const ol = $('#agList'); ol.textContent = '';
     $('#agEmpty').hidden = list.length > 0;
-    $('#agEmpty').textContent = t(scope === 'all' ? 'Aucune mobilisation annoncée pour l’instant.'
+    $('#agEmpty').textContent = agSel ? t('Rien d’annoncé ce jour-là.') : t(scope === 'all' ? 'Aucune mobilisation annoncée pour l’instant.'
       : me ? t('Rien d’annoncé à moins de 50 km de toi. Regarde « Toute la France ».') : t('Rien d’annoncé à moins de 50 km du centre de la carte. Active ta position ou regarde « Toute la France ».'));
     let day = '';
     if (list.length > 200) ol.append(el('li', { class: 'ag-day' }, t('{n} événements : les 200 premiers', { n: list.length })));
@@ -2340,6 +2347,33 @@
       if (d !== day) { day = d; ol.append(el('li', { class: 'ag-day' }, d)); }
       ol.append(agRow(e, ref));
     }
+  }
+  // ---- Calendrier du mois (repris d'Armana) : une pastille par jour qui a un événement, un appui filtre la liste ----
+  const dayKey = x => { const d = new Date(x); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
+  let agSel = null, agMonth = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
+  function renderCal(list) {
+    const box = $('#agCal'); if (!box) return; box.textContent = '';
+    const days = new Map(); for (const e of list) { const k = dayKey(Math.max(e.start, Date.now())); days.set(k, (days.get(k) || 0) + 1); }
+    const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1);
+    const y = agMonth.getFullYear(), m = agMonth.getMonth();
+    const prev = el('button', { class: 'cal-nav', 'aria-label': t('Mois précédent') }, '‹'), next = el('button', { class: 'cal-nav', 'aria-label': t('Mois suivant') }, '›');
+    prev.disabled = agMonth <= first;
+    prev.onclick = () => { agMonth = new Date(y, m - 1, 1); agSel = null; renderAgenda(); };
+    next.onclick = () => { agMonth = new Date(y, m + 1, 1); agSel = null; renderAgenda(); };
+    box.append(el('div', { class: 'cal-head' }, prev, el('b', {}, agMonth.toLocaleDateString(I18N.locale, { month: 'long', year: 'numeric' })), next));
+    const grid = el('div', { class: 'cal-grid' });
+    for (let i = 0; i < 7; i++) grid.append(el('span', { class: 'cal-wd' }, new Date(2024, 0, 1 + i).toLocaleDateString(I18N.locale, { weekday: 'narrow' })));
+    const pad = (new Date(y, m, 1).getDay() + 6) % 7; for (let i = 0; i < pad; i++) grid.append(el('span'));
+    const today = dayKey(now), nDays = new Date(y, m + 1, 0).getDate();
+    for (let d = 1; d <= nDays; d++) {
+      const k = y + '-' + (m + 1) + '-' + d, past = new Date(y, m, d + 1) <= now, n = days.get(k) || 0;
+      const b = el('button', { class: 'cal-day' + (k === today ? ' today' : '') + (k === agSel ? ' sel' : '') + (n ? ' has' : ''), 'aria-pressed': String(k === agSel) }, String(d), n ? el('i', { 'aria-hidden': 'true' }) : '');
+      b.disabled = past;
+      b.onclick = () => { agSel = agSel === k ? null : k; renderAgenda(); };
+      grid.append(b);
+    }
+    box.append(grid);
+    if (agSel) { const c = el('button', { class: 'link-btn cal-all' }, t('Voir tout l’agenda')); c.onclick = () => { agSel = null; renderAgenda(); }; box.append(c); }
   }
   const agDay = (e, now) => e.start < now ? t('En cours') : new Date(e.start).toLocaleDateString(I18N.locale, { weekday: 'long', day: 'numeric', month: 'long' });
   function agRow(e, ref) {
@@ -3235,4 +3269,87 @@
   }
   $('#testBandX').onclick = () => { try { localStorage.setItem(TEST_KEY, cfg.androidTest); } catch {} $('#testBand').hidden = true; };
   testShow();
+  // ---- Refonte de l'interface (proposition) ----
+  // Réorganise les écrans existants sans toucher à leur code : on DÉPLACE les éléments (leurs écouteurs suivent),
+  // pour que chaque chose soit là où on s'en sert. Une version définitive déplacerait plutôt le HTML lui-même.
+  const moveTo = (box, ...nodes) => nodes.forEach(n => { if (n) box.append(n); });
+
+  // -- Actions rapides (bouton ⚡ sur la carte) : ce qui sert dans l'urgence, à un appui --
+  const quick = $('#quickList');
+  moveTo(quick,
+    $('#btnList'),                                   // signalements dans la zone
+    $('#violenceLink'),                              // signaler une violence policière
+    document.querySelector('#sheetRights [data-wipe]')); // tout effacer de ce téléphone
+  $('#btnQuick').onclick = () => { closeReport(); map.closePopup(); const was = !$('#sheetQuick').hidden; closeSheets(); if (!was) $('#sheetQuick').hidden = false; };
+  $('#qkClose').onclick = () => closeSheets();
+  // « Je suis interpellé·e » reste dans SOS ; « Enregistrer le son » reste sur la carte (🎙️)
+  for (const id of ['#btnSosRights', '#btnSon', '#btnSonMore']) { const b = $(id); if (b) { b.hidden = true; b.dataset.refonte = 'off'; } }
+
+  // -- Agenda : calendrier et liste d'abord (comme Armana), puis les annonces des orgas et les arrêtés en cours --
+  const now = $('#agNow');
+  now.append(el('h3', { class: 'menu-group' }, t('Annonces des orgas')));
+  moveTo(now, $('#feedAnn'));
+  now.append(el('h3', { class: 'menu-group' }, t('Arrêtés et restrictions')));
+  moveTo(now, $('#feedOrd'), $('#btnOrders'));
+  $('#agEmpty').after(now);
+
+  // -- Réglages : des thèmes d'abord, leur contenu ensuite (comme le Profil d'Armana) --
+  const info = $('#sheetInfo'), q = s => info.querySelector(s);
+  const SECTIONS = [
+    { k: 'manif', ico: '🚩', title: 'Pendant la manif', sub: 'Mode manif, alertes, batterie',
+      nodes: () => [$('#btnManif'), $('#btnNotif'), $('#btnNotifInfo'), $('#optEco')?.closest('label')] },
+    { k: 'avant', ico: '🎒', title: 'Avant de partir', sub: 'Checklist, hors ligne, installer, flouter',
+      nodes: () => [$('#btnPrep')?.closest('.tiles'), $('#prefetchState'), $('#installBox'), q('a[href="/flouter"]'), $('#btnPrepInfo'), $('#testCard'), $('#playCard')] },
+    { k: 'droits', ico: '⚖️', title: 'Mes droits', sub: 'Legal team, sommations, garde à vue…',
+      nodes: () => [...$('#sheetRights').children].filter(n => !n.classList.contains('sheet-head')) },
+    { k: 'grandir', ico: '📣', title: 'Faire grandir Cortège', sub: 'Partager, affiche, idées, accès orga',
+      nodes: () => [$('#btnShare')?.closest('.tiles'), $('#orgaRequestCard')] },
+    { k: 'apparence', ico: '🎨', title: 'Apparence et langue', sub: 'Thème, texte, contraste, langue',
+      nodes: () => [q('.lang-row'), $('#themeLabel'), $('#themeSeg'), $('#optBig')?.closest('label'), $('#optContrast')?.closest('label')] },
+    { k: 'securite', ico: '🛡️', title: 'Sécurité', sub: 'Tor, accès perdu, tout effacer',
+      nodes: () => [$('#onionTip'), $('#btnRecover'), q('[data-wipe]'), q('[data-wipe]')?.nextElementSibling] },
+    { k: 'soutenir', ico: '❤️', title: 'Soutenir Cortège', sub: 'Don, suivre le projet',
+      nodes: () => [$('#kofiLink'), $('#igLink')] },
+    { k: 'apropos', ico: 'ℹ️', title: 'À propos', sub: 'Comment ça marche, nouveautés, mentions légales',
+      nodes: () => [q('ul.tips'), $('#btnNews')?.closest('.tiles'), $('#btnWelcome')?.closest('p'), q('.menu-foot'), q('.credit'), $('#poweredBy')] },
+  ];
+  // Le conseil Tor vit dans la liste « Comment ça marche » : on le sort avant de déplacer cette liste
+  const head = info.querySelector('.sheet-head');
+  const menu = el('nav', { class: 'rg-menu', 'aria-label': t('Réglages') });
+  const subs = {};
+  for (const s of SECTIONS) {
+    const page = el('div', { class: 'rg-sub', hidden: '' });
+    const back = el('button', { type: 'button', class: 'rg-back' }, '‹ ' + t('Réglages'));
+    back.onclick = () => openRg(null);
+    page.append(back, el('h3', { class: 'rg-title' }, s.ico + ' ' + t(s.title)));
+    const wrap = s.k === 'securite' ? el('ul', { class: 'tips' }) : null;
+    for (const n of s.nodes()) {
+      if (!n) continue;
+      if (n.tagName === 'LI') { wrap.append(n); continue; }
+      page.append(n);
+    }
+    if (wrap && wrap.children.length) page.insertBefore(wrap, page.children[2] || null);
+    subs[s.k] = page;
+    const row = el('button', { type: 'button', class: 'rg-row' }, el('span', { class: 'rg-ico', 'aria-hidden': 'true' }, s.ico),
+      el('span', { class: 'rg-txt' }, el('b', {}, t(s.title)), el('small', {}, t(s.sub))), el('span', { class: 'rg-go', 'aria-hidden': 'true' }, '›'));
+    row.onclick = () => openRg(s.k);
+    menu.append(row);
+  }
+  // Ce qui reste dans l'ancien « Plus » (titres de groupes vides, « Organiser une manif » en doublon de l'Agenda) est masqué
+  for (const n of [...info.children]) if (n !== head) { n.hidden = true; n.dataset.refonte = 'off'; }
+  head.after(menu);
+  menu.after(...Object.values(subs));
+  function openRg(k) {
+    menu.hidden = !!k;
+    for (const [key, page] of Object.entries(subs)) page.hidden = key !== k;
+    $('#siTitle').textContent = t('Réglages');
+    if (k === 'droits') renderLegal();
+    info.scrollTop = 0;
+  }
+  // Ouvrir l'onglet Réglages revient toujours au menu ; « Droits » (mode manif, préparation) ouvre directement Mes droits
+  const sheetInfoWatch = new MutationObserver(() => { if (info.hidden) openRg(null); });
+  sheetInfoWatch.observe(info, { attributes: true, attributeFilter: ['hidden'] });
+  const openRights = () => { closeReport(); closeSheets(); info.hidden = false; openRg('droits'); };
+  $('#mbLegal').onclick = openRights;
+  if ($('#prepRights')) $('#prepRights').onclick = openRights;
 })();

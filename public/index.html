@@ -42,20 +42,19 @@
 </div>
 
 <header class="topbar">
-  <a class="brand" id="brandLink" href="https://www.instagram.com/neru/" target="_blank" rel="noopener noreferrer">
+  <div class="brand" id="brandLink">
     <img class="logo-img" src="/brand/pin.png" alt="" width="38" height="38">
     <span class="logo" aria-hidden="true" hidden></span>
     <div class="brand-txt">
-      <div class="name">Cortège <span class="by">par <b class="handle">@neru</b></span></div>
+      <div class="name">Cortège</div>
       <div class="event" id="eventName">—</div>
     </div>
-  </a>
+  </div>
   <div class="top-right">
-    <a class="neru-sig" id="neruSig" href="https://www.instagram.com/neru/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="/brand/logo.png" alt="" width="30" height="30"></a>
     <span class="orga-chip" id="orgaChip" hidden></span>
     <button class="queue-chip" id="queueChip" hidden>⏳ 0</button>
     <div class="status" id="status" data-state="connecting"><span class="dot"></span><span class="txt">Connexion…</span></div>
-    <a class="kofi-pill" id="btnKofi" href="https://ko-fi.com/neru" target="_blank" rel="noopener noreferrer" aria-label="Soutenir Cortège sur Ko-fi">
+    <a class="kofi-pill" id="btnKofi" hidden href="https://ko-fi.com/neru" target="_blank" rel="noopener noreferrer" aria-label="Soutenir Cortège sur Ko-fi">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"></path></svg>
       <span>Soutenir</span>
     </a>
@@ -96,6 +95,8 @@
   <div id="anns" class="anns" aria-live="polite"></div>
 </div>
 
+<button type="button" class="locate-pill" id="btnLocate" title="Me localiser" aria-label="Me localiser"><span class="lp-ico" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg></span><span class="lp-txt">Ma position</span></button>
+
 <div class="crosshair" id="crosshair" hidden aria-hidden="true"><span></span></div>
 
 <button class="calm-nav" id="calmNav" hidden aria-live="polite"><span class="arrow" id="calmArrow" aria-hidden="true">↑</span><span id="calmTxt"></span></button>
@@ -104,7 +105,6 @@
   <button class="round install-tool" id="btnInstallTool" hidden title="Installer l’appli" aria-label="Installer l’appli">⤓</button>
   <button class="round son-tool" id="btnSonMap" hidden title="Enregistrer le son" aria-label="Enregistrer le son">🎙️</button>
   <button class="round" id="btnSearch" title="Chercher une ville" aria-label="Chercher une ville">⌕</button>
-  <button class="round" id="btnLocate" title="Me localiser" aria-label="Me localiser">◎</button>
   <button class="round layers-btn" id="btnLayers" title="Ce que montre la carte" aria-label="Ce que montre la carte" aria-controls="sheetLayers">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 13l9 5 9-5"></path></svg>
     <span class="layers-dot" id="layersDot" hidden></span>
@@ -114,6 +114,7 @@
 <div class="tools tools-left">
   <button class="round orga-tool" id="btnOrga" hidden title="Espace orga" aria-label="Espace orga">📣</button>
   <button class="round idea-tool" id="btnIdeaVote" hidden title="Idées au vote" aria-label="Idées au vote"><span aria-hidden="true">💡</span><span class="idea-badge" id="ideaBadgeMap" hidden></span></button>
+  <button class="round quick-tool" id="btnQuick" title="Actions rapides" aria-label="Actions rapides" aria-controls="sheetQuick"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg></button>
   <button class="round sos" id="btnSos" title="Interpellation : prévenir un proche" aria-label="Interpellation : prévenir un proche">SOS</button>
 </div>
 
@@ -133,7 +134,11 @@
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"></path><path d="M9 3v15M15 6v15"></path></svg>
     <span>Carte</span>
   </button>
-  <button type="button" class="tab" id="tabInfos" aria-controls="sheetFeed">
+  <button type="button" class="tab" id="tabAgenda" aria-controls="sheetAgenda">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>
+    <span>Agenda</span>
+  </button>
+  <button type="button" class="tab" id="tabInfos" aria-controls="sheetFeed" hidden>
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
     <span>Infos</span>
     <b class="tab-badge" id="infosBadge" hidden></b>
@@ -142,13 +147,13 @@
     <span class="tr-ico" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
     <span class="tr-lbl" id="reportLbl">Signaler</span>
   </button>
-  <button type="button" class="tab" id="tabRights" aria-controls="sheetRights">
+  <button type="button" class="tab" id="tabRights" aria-controls="sheetRights" hidden>
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg>
     <span>Droits</span>
   </button>
   <button type="button" class="tab" id="tabMore" aria-controls="sheetInfo">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg>
-    <span>Plus</span>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>
+    <span>Réglages</span>
   </button>
 </nav>
 
@@ -278,7 +283,7 @@
 <!-- Plus -->
 <section class="sheet page" id="sheetInfo" hidden aria-labelledby="siTitle">
   <div class="sheet-head">
-    <h2 id="siTitle">Plus</h2>
+    <h2 id="siTitle">Réglages</h2>
     <button class="x" id="siClose" aria-label="Fermer">×</button>
   </div>
 
@@ -806,18 +811,28 @@
 </div>
 
 <!-- Agenda -->
-<section class="sheet" id="sheetAgenda" hidden aria-labelledby="agTitle">
+<section class="sheet" id="sheetQuick" hidden aria-labelledby="qkTitle">
   <div class="sheet-head">
-    <h2 id="agTitle">Prochaines mobilisations</h2>
+    <h2 id="qkTitle">Actions rapides</h2>
+    <button class="x" id="qkClose" aria-label="Fermer">×</button>
+  </div>
+  <div class="quick-list" id="quickList"></div>
+</section>
+
+<section class="sheet page" id="sheetAgenda" hidden aria-labelledby="agTitle">
+  <div class="sheet-head">
+    <h2 id="agTitle">Agenda</h2>
     <button class="x" id="agClose" aria-label="Fermer">×</button>
   </div>
-  <fieldset class="seg" aria-label="Zone">
-    <label><input type="radio" name="agScope" value="near" checked> Près de toi (50 km)</label>
-    <label><input type="radio" name="agScope" value="all"> Toute la France</label>
+  <button class="install ag-propose" id="btnPropose">＋ Annoncer une manif</button>
+  <div id="agNow" class="ag-now"></div>
+  <div class="ag-cal" id="agCal"></div>
+  <fieldset class="seg" aria-label="Zone" hidden>
+    <label><input type="radio" name="agScope" value="near"> Près de toi (50 km)</label>
+    <label><input type="radio" name="agScope" value="all" checked> Toute la France</label>
   </fieldset>
   <ol id="agList" class="list ag-list"></ol>
   <p class="empty" id="agEmpty" hidden></p>
-  <button class="secondary" id="btnPropose">Proposer un blocus ou une manif</button>
   <p class="fine" id="agFine">Les propositions sont vérifiées avant d’apparaître. Les orgas publient directement depuis leur espace.</p>
 </section>
 
