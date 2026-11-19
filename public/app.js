@@ -197,6 +197,42 @@
   map.on('moveend', updateProfile);
   updateProfile();
 
+  // ---- Icônes de l'interface (refonte) : une seule famille, traits arrondis sur une grille de 24, redessinées d'après la planche validée ----
+  // Blanc par défaut (currentColor, suit le thème) ; une couleur d'accent seulement là où la planche en met une.
+  const ICO_COL = { pink: '#f03c8c', yellow: '#ffcf4a', red: '#cf3036', orange: '#ff9f1c', blue: '#5b8cff', green: '#30a46c' };
+  const ICO = {
+    signaler: '<path d="M5 10.5v4h2.6L14 18.5V6.5L7.6 10.5z"/><path d="M7.6 14.5l1.2 4.5h2.4l-1-4"/><path d="M17 9.5a3.6 3.6 0 0 1 0 5.6M19.3 7.4a6.6 6.6 0 0 1 0 9.8"/>',
+    carte: '<path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/>',
+    agenda: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><rect x="7" y="13" width="2.2" height="2" rx=".4"/><rect x="11" y="13" width="2.2" height="2" rx=".4"/><rect x="15" y="13" width="2.2" height="2" rx=".4"/><rect x="7" y="16.6" width="2.2" height="2" rx=".4"/><rect x="11" y="16.6" width="2.2" height="2" rx=".4"/>',
+    actions: '<path d="M13.5 2.5L5 13.5h6.2L10 21.5l8.5-11.2h-6.2z"/>',
+    reglages: '<path d="M4 6h3.2M10.8 6H20M4 12h9.2M16.8 12H20M4 18h5.2M12.8 18H20"/><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="12" r="1.8"/><circle cx="11" cy="18" r="1.8"/>',
+    position: '<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.6"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/>',
+    chercher: '<circle cx="14" cy="10" r="6"/><path d="M9.8 14.2L4 20"/>',
+    calques: '<path d="M12 3.5l8.5 4.7-8.5 4.7-8.5-4.7z"/><path d="M3.5 12.5l8.5 4.7 8.5-4.7"/>',
+    micro: '<rect x="8.5" y="3" width="6" height="11" rx="3"/><path d="M5 11a6.5 6.5 0 0 0 13 0M11.5 17.5V21M8 21h7"/><circle cx="19.5" cy="4.5" r="2" fill="#cf3036" stroke="none"/>',
+    drapeau: '<path d="M6 21.5V5"/><circle cx="6" cy="3.6" r="1.1"/><path d="M6 5.5h12.5l-2.6 4 2.6 4H6"/>',
+    zone: '<path d="M7.5 20s-4.8-4.8-4.8-8.6a4.8 4.8 0 0 1 9.6 0C12.3 15.2 7.5 20 7.5 20z"/><circle cx="7.5" cy="11.4" r="1.6"/><path d="M15 8h6M15 12.5h6M15 17h6"/>',
+    violence: '<path d="M12 3a8.5 8.5 0 0 0-7.4 12.7L3.5 20.5l4.8-1.2A8.5 8.5 0 1 0 12 3z"/><path d="M12 7.5v5.2M12 16.2v.01"/>',
+    effacer: '<path d="M14.5 4.5l5 5-9 9H6.2l-2.7-2.7a1.4 1.4 0 0 1 0-2z"/><path d="M9.6 9.4l5 5M14 20.5h7"/>',
+    annoncer: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M12 12.8v5.4M9.3 15.5h5.4"/>',
+    arretes: '<path d="M13.5 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h5"/><path d="M13.5 3L19 8.5V12M13.5 3v5.5H19"/><path d="M8 12h6M8 15.5h3"/><circle cx="17" cy="17.5" r="3.5"/><path d="M15.6 17.5l1 1 1.8-1.9"/>',
+    partager: '<rect x="3.5" y="3.5" width="6" height="6" rx="1"/><rect x="14.5" y="3.5" width="6" height="6" rx="1"/><rect x="3.5" y="14.5" width="6" height="6" rx="1"/><path d="M14.5 14.5h2.5v2.5M20.5 14.5v.01M14.5 20.5h.01M17.5 20.5h3v-3"/>',
+    manif: '<circle cx="7" cy="10" r="2"/><circle cx="12.5" cy="8.5" r="2"/><path d="M3.5 20a3.5 3.5 0 0 1 7 0M9 18.5a3.5 3.5 0 0 1 7 0"/><path d="M18 15V3.5h3.5l-1 1.6 1 1.6H18"/>',
+    blocus: '<path d="M3 9.5h18v5H3z"/><path d="M7.5 9.5l-3 5M12 9.5l-3 5M16.5 9.5l-3 5M21 9.5l-3 5"/><path d="M5.5 14.5V20M18.5 14.5V20M5.5 9.5V6M18.5 9.5V6"/><circle cx="5.5" cy="4.8" r="1.1"/><circle cx="18.5" cy="4.8" r="1.1"/>',
+    rassemblement: '<path d="M12 21.5s-7-6.6-7-12a7 7 0 0 1 14 0c0 5.4-7 12-7 12z"/><circle cx="12" cy="7.6" r="1.4"/><circle cx="8.9" cy="8.8" r="1.1"/><circle cx="15.1" cy="8.8" r="1.1"/><path d="M9.3 12.8a2.7 2.7 0 0 1 5.4 0"/>',
+    ag: '<path d="M12 3.5a4 4 0 0 1 3.5 6l.6 2-2-.6A4 4 0 1 1 12 3.5z"/><path d="M7 11.5a4 4 0 0 1 3.6 5.8l.5 2-2-.5A4 4 0 1 1 7 11.5z"/><path d="M17 11.5a4 4 0 0 0-3.6 5.8l-.5 2 2-.5A4 4 0 1 0 17 11.5z"/>',
+    sac: '<path d="M6 9.5a6 6 0 0 1 12 0v10a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 19.5z"/><path d="M9 5V3h6v2M9 14h6v4H9z"/>',
+    droits: '<path d="M12 3.5V20M7.5 21h9M5 7h14"/><path d="M5 7l-3 6.5h6zM19 7l-3 6.5h6z"/><path d="M2 13.5a3 3 0 0 0 6 0M16 13.5a3 3 0 0 0 6 0"/><circle cx="12" cy="3.5" r=".6"/>',
+    grandir: '<path d="M3.5 10v4h3l7 4V6l-7 4z"/><path d="M6.5 14l1 4.5H10l-.6-3.5"/><path d="M19 9v6M16 12h6"/>',
+    apparence: '<path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.8 1.8-1.8 0-1.3-1.3-1.6-1.3-2.7 0-.9.8-1.5 1.7-1.5H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/>',
+    securite: '<path d="M12 3l7.5 3v5.5c0 4.7-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.8-7.5-9.5V6z"/><circle cx="12" cy="10.5" r="1.8"/><path d="M12 12.3v3.2"/>',
+    soutenir: '<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>',
+    apropos: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.01"/>',
+  };
+  // Couleur d'accent de chaque type d'événement (cartes de l'agenda, épingles, filtres)
+  const TYPE_ICO = { manif: ['manif', 'pink'], blocus: ['blocus', 'orange'], rassemblement: ['rassemblement', 'blue'], ag: ['ag', 'green'] };
+  const icoSvg = (name, size = 22, color = null) => `<svg class="ico-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color ? (ICO_COL[color] || color) : 'currentColor'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[name] || ''}</svg>`;
+  const icoEl = (name, size, color) => { const t = document.createElement('template'); t.innerHTML = icoSvg(name, size, color); return t.content.firstChild; };
   // ---- Utilitaires ----
   const ago = x => { const m = Math.round((Date.now() - x) / MIN); return m < 1 ? t('à l’instant') : t('il y a {m} min', { m }); };
   const left = exp => { const m = Math.max(0, Math.round((exp - Date.now()) / MIN)); return t('{m} min', { m }); };
@@ -2188,7 +2224,7 @@
     $('#btnOrga').hidden = !o;
     $('#orgaChip').hidden = !o;
     if (o) { $('#orgaChip').textContent = o.admin ? 'ADMIN' : o.trial ? t('ORGA · essai') : 'ORGA'; $('#orgaChip').title = o.label; }
-    $('#btnPropose').textContent = '＋ ' + t(o ? 'Publier une manif ou un blocus' : 'Annoncer une manif');
+    { const p = $('#btnPropose'); p.textContent = ''; if (typeof icoEl === 'function') p.append(icoEl('annoncer', 19), ' '); p.append(t(o ? 'Publier une manif ou un blocus' : 'Annoncer une manif')); }
     $('#agFine').hidden = !!o;
     if (orgaMod) orgaMod.onOrga(o);
   }
@@ -2319,7 +2355,7 @@
         if (e.end) L.marker(e.route[e.route.length - 1], { icon: L.divIcon({ className: '', iconSize: [30, 30], html: '<div class="ev-end">🏁</div>' }), title: t('Dispersion prévue'), keyboard: false })
           .bindPopup(() => el('div', {}, t('Dispersion prévue : {title}', { title: e.title }))).addTo(evLayer);
       }
-      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin">${ty.glyph}${e.start - Date.now() > 12 * 60 * MIN ? `<span class="ev-date">${new Date(e.start).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short' })}</span>` : ''}</div>` }),
+      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin"${TYPE_ICO[e.type] ? ` style="background:${ICO_COL[TYPE_ICO[e.type][1]]}"` : ''}>${TYPE_ICO[e.type] ? icoSvg(TYPE_ICO[e.type][0], 22, '#fff') : ty.glyph}${e.start - Date.now() > 12 * 60 * MIN ? `<span class="ev-date">${new Date(e.start).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short' })}</span>` : ''}</div>` }),
         title: e.title, zIndexOffset: 500 }).bindPopup(() => evPopup(e)).addTo(evLayer);
       evMarkers.set(e.id, m);
     }
@@ -2371,7 +2407,7 @@
     const row1 = el('div', { class: 'ag-chips' });
     for (const [k, l] of [['all', 'Tout'], ['today', 'Aujourd’hui'], ['weekend', 'Ce week-end'], ['week', '7 jours']]) row1.append(chip(t(l), agWhen === k, () => { agWhen = k; }));
     const row2 = el('div', { class: 'ag-chips' });
-    for (const ty of Object.values(EVT)) row2.append(chip(ty.glyph + ' ' + t(ty.label.replace(/ \(.*\)/, '')), agTypes.has(ty.id), () => { agTypes.has(ty.id) ? agTypes.delete(ty.id) : agTypes.add(ty.id); }));
+    for (const ty of Object.values(EVT)) row2.append(chip(TYPE_ICO[ty.id] ? el('span', { class: 'chip-ico' }, icoEl(TYPE_ICO[ty.id][0], 15, TYPE_ICO[ty.id][1]), t(ty.label.replace(/ \(.*\)/, ''))) : ty.glyph + ' ' + t(ty.label.replace(/ \(.*\)/, '')), agTypes.has(ty.id), () => { agTypes.has(ty.id) ? agTypes.delete(ty.id) : agTypes.add(ty.id); }));
     box.append(row1, row2);
   }
   let agSel = null, agMonth = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
@@ -2414,7 +2450,7 @@
         el('small', { class: 'aff-mois' }, sd.toLocaleDateString(I18N.locale, { month: 'short' }).replace('.', '')),
         el('span', { class: 'aff-heure' }, fmtHour(e.start))),
       el('span', { class: 'aff-info' },
-        el('span', { class: 'aff-type' }, ty.glyph + ' ' + t(ty.label)),
+        el('span', { class: 'aff-type' }, TYPE_ICO[e.type] ? icoEl(TYPE_ICO[e.type][0], 14) : ty.glyph + ' ', t(ty.label)),
         el('span', { class: 'aff-titre' }, e.title),
         el('span', { class: 'aff-lieu' }, '📍 ' + e.place + ' · ' + fmtDist(dist(ref, [e.lat, e.lng]))),
         ban ? el('span', { class: 'aff-ban' }, '🚫 ' + t('Arrêté en vigueur dans la zone')) : el('span', { class: 'aff-by' }, t('Par {who}', { who: e.by }))));
@@ -3401,5 +3437,25 @@
   sheetInfoWatch.observe(info, { attributes: true, attributeFilter: ['hidden'] });
   const openRights = () => { closeReport(); closeSheets(); info.hidden = false; openRg('droits'); };
   $('#mbLegal').onclick = openRights;
+
+  // ---- Icônes de la planche validée, posées sur les éléments existants ----
+  const swapSvg = (host, name, size = 24, color) => { if (!host) return; const old = host.querySelector('svg'); const n = icoEl(name, size, color); old ? old.replaceWith(n) : host.prepend(n); };
+  swapSvg($('#tabMap'), 'carte'); swapSvg($('#tabAgenda'), 'agenda'); swapSvg($('#tabActions'), 'actions', 24, 'yellow'); swapSvg($('#tabMore'), 'reglages');
+  { const tr = $('#btnReport .tr-ico'); if (tr) { tr.textContent = ''; tr.append(icoEl('signaler', 30, '#fff')); } }
+  { const lp = $('#btnLocate .lp-ico'); if (lp) { lp.textContent = ''; lp.append(icoEl('position', 19)); } }
+  { const s = $('#btnSearch'); s.textContent = ''; s.append(icoEl('chercher', 22)); }
+  swapSvg($('#btnLayers'), 'calques', 22);
+  swapSvg($('#btnManifMap'), 'drapeau', 22, '#fff');
+  const setTileIco = (tile, name, color) => { const i = tile?.querySelector('.ico'); if (i) { i.textContent = ''; i.append(icoEl(name, 22, color)); } };
+  setTileIco($('#btnManifQuick'), 'drapeau', 'pink'); setTileIco($('#btnSonQuick'), 'micro'); setTileIco($('#btnList'), 'zone');
+  { const v = $('#violenceLink b'); if (v) v.prepend(icoEl('violence', 18, 'red'), ' '); }
+  for (const w of document.querySelectorAll('[data-wipe] .wipe-txt b')) w.prepend(icoEl('effacer', 17), ' ');
+  { const p = $('#btnPropose'); p.textContent = ''; p.append(icoEl('annoncer', 19), ' ' + t(orga ? 'Publier une manif ou un blocus' : 'Annoncer une manif')); p.classList.add('btn-ico'); }
+  { const o = $('#btnOrders'); if (o) { o.prepend(icoEl('arretes', 18), ' '); o.classList.add('btn-ico'); } }
+  const RG_ICO = { manif: 'drapeau', avant: 'sac', droits: 'droits', grandir: 'grandir', apparence: 'apparence', securite: 'securite', soutenir: 'soutenir', apropos: 'apropos' };
+  SECTIONS.forEach((s, i) => {
+    const row = menu.children[i], ico = row.querySelector('.rg-ico'); ico.textContent = ''; ico.append(icoEl(RG_ICO[s.k], 24, s.k === 'soutenir' ? 'pink' : null));
+    const title = subs[s.k].querySelector('.rg-title'); title.textContent = ''; title.append(icoEl(RG_ICO[s.k], 22), ' ' + t(s.title));
+  });
   if ($('#prepRights')) $('#prepRights').onclick = openRights;
 })();

@@ -95,4 +95,24 @@
   sheetInfoWatch.observe(info, { attributes: true, attributeFilter: ['hidden'] });
   const openRights = () => { closeReport(); closeSheets(); info.hidden = false; openRg('droits'); };
   $('#mbLegal').onclick = openRights;
+
+  // ---- Icônes de la planche validée, posées sur les éléments existants ----
+  const swapSvg = (host, name, size = 24, color) => { if (!host) return; const old = host.querySelector('svg'); const n = icoEl(name, size, color); old ? old.replaceWith(n) : host.prepend(n); };
+  swapSvg($('#tabMap'), 'carte'); swapSvg($('#tabAgenda'), 'agenda'); swapSvg($('#tabActions'), 'actions', 24, 'yellow'); swapSvg($('#tabMore'), 'reglages');
+  { const tr = $('#btnReport .tr-ico'); if (tr) { tr.textContent = ''; tr.append(icoEl('signaler', 30, '#fff')); } }
+  { const lp = $('#btnLocate .lp-ico'); if (lp) { lp.textContent = ''; lp.append(icoEl('position', 19)); } }
+  { const s = $('#btnSearch'); s.textContent = ''; s.append(icoEl('chercher', 22)); }
+  swapSvg($('#btnLayers'), 'calques', 22);
+  swapSvg($('#btnManifMap'), 'drapeau', 22, '#fff');
+  const setTileIco = (tile, name, color) => { const i = tile?.querySelector('.ico'); if (i) { i.textContent = ''; i.append(icoEl(name, 22, color)); } };
+  setTileIco($('#btnManifQuick'), 'drapeau', 'pink'); setTileIco($('#btnSonQuick'), 'micro'); setTileIco($('#btnList'), 'zone');
+  { const v = $('#violenceLink b'); if (v) v.prepend(icoEl('violence', 18, 'red'), ' '); }
+  for (const w of document.querySelectorAll('[data-wipe] .wipe-txt b')) w.prepend(icoEl('effacer', 17), ' ');
+  { const p = $('#btnPropose'); p.textContent = ''; p.append(icoEl('annoncer', 19), ' ' + t(orga ? 'Publier une manif ou un blocus' : 'Annoncer une manif')); p.classList.add('btn-ico'); }
+  { const o = $('#btnOrders'); if (o) { o.prepend(icoEl('arretes', 18), ' '); o.classList.add('btn-ico'); } }
+  const RG_ICO = { manif: 'drapeau', avant: 'sac', droits: 'droits', grandir: 'grandir', apparence: 'apparence', securite: 'securite', soutenir: 'soutenir', apropos: 'apropos' };
+  SECTIONS.forEach((s, i) => {
+    const row = menu.children[i], ico = row.querySelector('.rg-ico'); ico.textContent = ''; ico.append(icoEl(RG_ICO[s.k], 24, s.k === 'soutenir' ? 'pink' : null));
+    const title = subs[s.k].querySelector('.rg-title'); title.textContent = ''; title.append(icoEl(RG_ICO[s.k], 22), ' ' + t(s.title));
+  });
   if ($('#prepRights')) $('#prepRights').onclick = openRights;

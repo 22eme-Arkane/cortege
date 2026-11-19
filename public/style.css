@@ -1195,3 +1195,14 @@ body.medic.md-nosig .leaflet-reports-pane { display: none; }
 .topbar { min-height: calc(env(safe-area-inset-top, 0px) + 58px); justify-content: flex-end; }
 /* En-tête : « Cortège » seul, sans logo (emplacement du logo à décider) */
 .topbar .logo-img { display: none; }
+/* Icônes de la planche : alignement dans les boutons, puces et tuiles */
+.ico-svg { flex: none; vertical-align: -0.2em; }
+.tab .ico-svg { width: 24px; height: 24px; }
+.btn-ico { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.chip-ico { display: inline-flex; align-items: center; gap: 6px; }
+.aff-type { display: inline-flex; align-items: center; gap: 5px; }
+.ev-pin .ico-svg { width: 22px; height: 22px; }
+.rg-ico, .tile .ico { display: grid; place-items: center; }
+.rg-title { display: flex; align-items: center; gap: 8px; }
+.violence-btn b, .wipe-txt b { display: inline-flex; align-items: center; gap: 6px; }
+.tr-ico { display: grid; place-items: center; }

@@ -44,7 +44,7 @@
         if (e.end) L.marker(e.route[e.route.length - 1], { icon: L.divIcon({ className: '', iconSize: [30, 30], html: '<div class="ev-end">🏁</div>' }), title: t('Dispersion prévue'), keyboard: false })
           .bindPopup(() => el('div', {}, t('Dispersion prévue : {title}', { title: e.title }))).addTo(evLayer);
       }
-      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin">${ty.glyph}${e.start - Date.now() > 12 * 60 * MIN ? `<span class="ev-date">${new Date(e.start).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short' })}</span>` : ''}</div>` }),
+      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin"${TYPE_ICO[e.type] ? ` style="background:${ICO_COL[TYPE_ICO[e.type][1]]}"` : ''}>${TYPE_ICO[e.type] ? icoSvg(TYPE_ICO[e.type][0], 22, '#fff') : ty.glyph}${e.start - Date.now() > 12 * 60 * MIN ? `<span class="ev-date">${new Date(e.start).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short' })}</span>` : ''}</div>` }),
         title: e.title, zIndexOffset: 500 }).bindPopup(() => evPopup(e)).addTo(evLayer);
       evMarkers.set(e.id, m);
     }
@@ -96,7 +96,7 @@
     const row1 = el('div', { class: 'ag-chips' });
     for (const [k, l] of [['all', 'Tout'], ['today', 'Aujourd’hui'], ['weekend', 'Ce week-end'], ['week', '7 jours']]) row1.append(chip(t(l), agWhen === k, () => { agWhen = k; }));
     const row2 = el('div', { class: 'ag-chips' });
-    for (const ty of Object.values(EVT)) row2.append(chip(ty.glyph + ' ' + t(ty.label.replace(/ \(.*\)/, '')), agTypes.has(ty.id), () => { agTypes.has(ty.id) ? agTypes.delete(ty.id) : agTypes.add(ty.id); }));
+    for (const ty of Object.values(EVT)) row2.append(chip(TYPE_ICO[ty.id] ? el('span', { class: 'chip-ico' }, icoEl(TYPE_ICO[ty.id][0], 15, TYPE_ICO[ty.id][1]), t(ty.label.replace(/ \(.*\)/, ''))) : ty.glyph + ' ' + t(ty.label.replace(/ \(.*\)/, '')), agTypes.has(ty.id), () => { agTypes.has(ty.id) ? agTypes.delete(ty.id) : agTypes.add(ty.id); }));
     box.append(row1, row2);
   }
   let agSel = null, agMonth = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
@@ -139,7 +139,7 @@
         el('small', { class: 'aff-mois' }, sd.toLocaleDateString(I18N.locale, { month: 'short' }).replace('.', '')),
         el('span', { class: 'aff-heure' }, fmtHour(e.start))),
       el('span', { class: 'aff-info' },
-        el('span', { class: 'aff-type' }, ty.glyph + ' ' + t(ty.label)),
+        el('span', { class: 'aff-type' }, TYPE_ICO[e.type] ? icoEl(TYPE_ICO[e.type][0], 14) : ty.glyph + ' ', t(ty.label)),
         el('span', { class: 'aff-titre' }, e.title),
         el('span', { class: 'aff-lieu' }, '📍 ' + e.place + ' · ' + fmtDist(dist(ref, [e.lat, e.lng]))),
         ban ? el('span', { class: 'aff-ban' }, '🚫 ' + t('Arrêté en vigueur dans la zone')) : el('span', { class: 'aff-by' }, t('Par {who}', { who: e.by }))));
