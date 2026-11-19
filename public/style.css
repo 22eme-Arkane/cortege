@@ -1112,6 +1112,8 @@ body.medic.md-nosig .leaflet-reports-pane { display: none; }
 .locate-pill[data-state="follow"] { color: var(--accent); border-color: var(--accent); }
 .locate-pill[data-state="searching"] .lp-ico { animation: son-pulse 1.2s ease-in-out infinite; }
 .round.quick-tool { color: #1c1300; background: #ffcf4a; border-color: #ffcf4a; }
+/* Carte : seuls SOS et 🚩 restent ; le micro et les actions sont dans l’onglet Actions */
+#btnSonMap { display: none !important; }
 .round.manif-tool { color: #fff; background: #f03c8c; border-color: #f03c8c; }
 .quick-list { display: grid; gap: 10px; }
 .quick-list .violence-btn, .quick-list .wipe-btn, .quick-list .tile { margin: 0; }
