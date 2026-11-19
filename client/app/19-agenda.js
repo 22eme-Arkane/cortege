@@ -44,7 +44,7 @@
         if (e.end) L.marker(e.route[e.route.length - 1], { icon: L.divIcon({ className: '', iconSize: [30, 30], html: '<div class="ev-end">🏁</div>' }), title: t('Dispersion prévue'), keyboard: false })
           .bindPopup(() => el('div', {}, t('Dispersion prévue : {title}', { title: e.title }))).addTo(evLayer);
       }
-      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin"${TYPE_ICO[e.type] ? ` style="background:${ICO_COL[TYPE_ICO[e.type][1]]}"` : ''}>${TYPE_ICO[e.type] ? icoSvg(TYPE_ICO[e.type][0], 22, '#fff') : ty.glyph}${e.start - Date.now() > 12 * 60 * MIN ? `<span class="ev-date">${new Date(e.start).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short' })}</span>` : ''}</div>` }),
+      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin"${TYPE_ICO[e.type] ? ` style="background:${ICO_COL[TYPE_ICO[e.type][1]]}"` : ''}>${TYPE_ICO[e.type] ? icoHtml(TYPE_ICO[e.type][0], 22, '#fff') : ty.glyph}${e.start - Date.now() > 12 * 60 * MIN ? `<span class="ev-date">${new Date(e.start).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short' })}</span>` : ''}</div>` }),
         title: e.title, zIndexOffset: 500 }).bindPopup(() => evPopup(e)).addTo(evLayer);
       evMarkers.set(e.id, m);
     }

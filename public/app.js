@@ -231,8 +231,20 @@
   };
   // Couleur d'accent de chaque type d'événement (cartes de l'agenda, épingles, filtres)
   const TYPE_ICO = { manif: ['manif', 'pink'], blocus: ['blocus', 'orange'], rassemblement: ['rassemblement', 'blue'], ag: ['ag', 'green'] };
+  // Icônes de la planche générée (public/icons-ui/*.png, fond transparent). Les colorées s'affichent telles quelles ;
+  // les blanches servent de MASQUE, peintes dans la couleur du texte : elles suivent le thème clair ou sombre.
+  // Une couleur passée en paramètre repeint n'importe quelle icône (masque). Sans image (apparence, à propos) : le dessin SVG ci-dessus.
+  const ICO_PNG = new Set(['signaler', 'carte', 'agenda', 'actions', 'reglages', 'position', 'chercher', 'calques', 'micro', 'sos', 'drapeau-manif', 'zone',
+    'violence', 'effacer', 'annoncer', 'arretes', 'legal', 'partager', 'manif', 'blocus', 'rassemblement', 'ag', 'zone-calme', 'medic',
+    'drapeau', 'sac', 'droits', 'grandir', 'securite', 'soutenir']);
+  const ICO_COLORED = new Set(['signaler', 'actions', 'micro', 'sos', 'drapeau-manif', 'violence', 'manif', 'blocus', 'rassemblement', 'ag', 'zone-calme']);
+  const icoHtml = (name, size = 22, color = null) => {
+    if (!ICO_PNG.has(name)) return icoSvg(name, size, color);
+    if (!color && ICO_COLORED.has(name)) return `<img class="ico-png" src="/icons-ui/${name}.png" width="${size}" height="${size}" alt="" aria-hidden="true">`;
+    return `<span class="ico-png ico-mask" aria-hidden="true" style="--m:url(/icons-ui/${name}.png);width:${size}px;height:${size}px;background:${color ? (ICO_COL[color] || color) : 'currentColor'}"></span>`;
+  };
   const icoSvg = (name, size = 22, color = null) => `<svg class="ico-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color ? (ICO_COL[color] || color) : 'currentColor'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[name] || ''}</svg>`;
-  const icoEl = (name, size, color) => { const t = document.createElement('template'); t.innerHTML = icoSvg(name, size, color); return t.content.firstChild; };
+  const icoEl = (name, size, color) => { const t = document.createElement('template'); t.innerHTML = icoHtml(name, size, color); return t.content.firstChild; };
   // ---- Utilitaires ----
   const ago = x => { const m = Math.round((Date.now() - x) / MIN); return m < 1 ? t('à l’instant') : t('il y a {m} min', { m }); };
   const left = exp => { const m = Math.max(0, Math.round((exp - Date.now()) / MIN)); return t('{m} min', { m }); };
@@ -2355,7 +2367,7 @@
         if (e.end) L.marker(e.route[e.route.length - 1], { icon: L.divIcon({ className: '', iconSize: [30, 30], html: '<div class="ev-end">🏁</div>' }), title: t('Dispersion prévue'), keyboard: false })
           .bindPopup(() => el('div', {}, t('Dispersion prévue : {title}', { title: e.title }))).addTo(evLayer);
       }
-      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin"${TYPE_ICO[e.type] ? ` style="background:${ICO_COL[TYPE_ICO[e.type][1]]}"` : ''}>${TYPE_ICO[e.type] ? icoSvg(TYPE_ICO[e.type][0], 22, '#fff') : ty.glyph}${e.start - Date.now() > 12 * 60 * MIN ? `<span class="ev-date">${new Date(e.start).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short' })}</span>` : ''}</div>` }),
+      const m = L.marker([e.lat, e.lng], { icon: L.divIcon({ className: '', iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18], html: `<div class="ev-pin"${TYPE_ICO[e.type] ? ` style="background:${ICO_COL[TYPE_ICO[e.type][1]]}"` : ''}>${TYPE_ICO[e.type] ? icoHtml(TYPE_ICO[e.type][0], 22, '#fff') : ty.glyph}${e.start - Date.now() > 12 * 60 * MIN ? `<span class="ev-date">${new Date(e.start).toLocaleDateString(I18N.locale, { day: 'numeric', month: 'short' })}</span>` : ''}</div>` }),
         title: e.title, zIndexOffset: 500 }).bindPopup(() => evPopup(e)).addTo(evLayer);
       evMarkers.set(e.id, m);
     }
@@ -3440,15 +3452,16 @@
 
   // ---- Icônes de la planche validée, posées sur les éléments existants ----
   const swapSvg = (host, name, size = 24, color) => { if (!host) return; const old = host.querySelector('svg'); const n = icoEl(name, size, color); old ? old.replaceWith(n) : host.prepend(n); };
-  swapSvg($('#tabMap'), 'carte'); swapSvg($('#tabAgenda'), 'agenda'); swapSvg($('#tabActions'), 'actions', 24, 'yellow'); swapSvg($('#tabMore'), 'reglages');
-  { const tr = $('#btnReport .tr-ico'); if (tr) { tr.textContent = ''; tr.append(icoEl('signaler', 30, '#fff')); } }
-  { const lp = $('#btnLocate .lp-ico'); if (lp) { lp.textContent = ''; lp.append(icoEl('position', 19)); } }
-  { const s = $('#btnSearch'); s.textContent = ''; s.append(icoEl('chercher', 22)); }
-  swapSvg($('#btnLayers'), 'calques', 22);
-  swapSvg($('#btnManifMap'), 'drapeau', 22, '#fff');
+  const swapIco = (host, name, size = 24, color) => { if (!host) return; const old = host.querySelector('svg, .ico-png'); const n = icoEl(name, size, color); old ? old.replaceWith(n) : host.prepend(n); };
+  swapIco($('#tabMap'), 'carte'); swapIco($('#tabAgenda'), 'agenda'); swapIco($('#tabActions'), 'actions'); swapIco($('#tabMore'), 'reglages');
+  { const tr = $('#btnReport .tr-ico'); if (tr) { tr.textContent = ''; tr.append(icoEl('signaler', 54)); tr.classList.add('tr-ico-png'); } }
+  { const lp = $('#btnLocate .lp-ico'); if (lp) { lp.textContent = ''; lp.append(icoEl('position', 20)); } }
+  { const s = $('#btnSearch'); s.textContent = ''; s.append(icoEl('chercher', 24)); }
+  swapIco($('#btnLayers'), 'calques', 22);
+  swapIco($('#btnManifMap'), 'drapeau', 24, '#fff');
   const setTileIco = (tile, name, color) => { const i = tile?.querySelector('.ico'); if (i) { i.textContent = ''; i.append(icoEl(name, 22, color)); } };
-  setTileIco($('#btnManifQuick'), 'drapeau', 'pink'); setTileIco($('#btnSonQuick'), 'micro'); setTileIco($('#btnList'), 'zone');
-  { const v = $('#violenceLink b'); if (v) v.prepend(icoEl('violence', 18, 'red'), ' '); }
+  setTileIco($('#btnManifQuick'), 'drapeau-manif'); setTileIco($('#btnSonQuick'), 'micro'); setTileIco($('#btnList'), 'zone');
+  { const v = $('#violenceLink b'); if (v) v.prepend(icoEl('violence', 20), ' '); }
   for (const w of document.querySelectorAll('[data-wipe] .wipe-txt b')) w.prepend(icoEl('effacer', 17), ' ');
   { const p = $('#btnPropose'); p.textContent = ''; p.append(icoEl('annoncer', 19), ' ' + t(orga ? 'Publier une manif ou un blocus' : 'Annoncer une manif')); p.classList.add('btn-ico'); }
   { const o = $('#btnOrders'); if (o) { o.prepend(icoEl('arretes', 18), ' '); o.classList.add('btn-ico'); } }

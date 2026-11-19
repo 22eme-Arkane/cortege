@@ -1206,3 +1206,10 @@ body.medic.md-nosig .leaflet-reports-pane { display: none; }
 .rg-title { display: flex; align-items: center; gap: 8px; }
 .violence-btn b, .wipe-txt b { display: inline-flex; align-items: center; gap: 6px; }
 .tr-ico { display: grid; place-items: center; }
+.ico-png { display: inline-block; flex: none; vertical-align: -0.25em; object-fit: contain; }
+.ico-mask { -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+/* Signaler : l'icône rose de la planche (cercle et mégaphone) sur un rond sombre, au centre de la barre */
+#btnReport .tr-ico.tr-ico-png { background: var(--nav-bg, #0f1230) !important; border: 0; box-shadow: 0 4px 16px rgba(240, 60, 140, .45); }
+#btnReport .tr-ico.tr-ico-png .ico-png { width: 54px; height: 54px; }
+.tab .ico-png { width: 26px; height: 26px; }
+#btnReport.active .tr-ico.tr-ico-png { transform: none; box-shadow: 0 0 0 3px #f03c8c; }

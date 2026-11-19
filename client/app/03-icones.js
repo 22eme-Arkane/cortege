@@ -32,5 +32,17 @@
   };
   // Couleur d'accent de chaque type d'événement (cartes de l'agenda, épingles, filtres)
   const TYPE_ICO = { manif: ['manif', 'pink'], blocus: ['blocus', 'orange'], rassemblement: ['rassemblement', 'blue'], ag: ['ag', 'green'] };
+  // Icônes de la planche générée (public/icons-ui/*.png, fond transparent). Les colorées s'affichent telles quelles ;
+  // les blanches servent de MASQUE, peintes dans la couleur du texte : elles suivent le thème clair ou sombre.
+  // Une couleur passée en paramètre repeint n'importe quelle icône (masque). Sans image (apparence, à propos) : le dessin SVG ci-dessus.
+  const ICO_PNG = new Set(['signaler', 'carte', 'agenda', 'actions', 'reglages', 'position', 'chercher', 'calques', 'micro', 'sos', 'drapeau-manif', 'zone',
+    'violence', 'effacer', 'annoncer', 'arretes', 'legal', 'partager', 'manif', 'blocus', 'rassemblement', 'ag', 'zone-calme', 'medic',
+    'drapeau', 'sac', 'droits', 'grandir', 'securite', 'soutenir']);
+  const ICO_COLORED = new Set(['signaler', 'actions', 'micro', 'sos', 'drapeau-manif', 'violence', 'manif', 'blocus', 'rassemblement', 'ag', 'zone-calme']);
+  const icoHtml = (name, size = 22, color = null) => {
+    if (!ICO_PNG.has(name)) return icoSvg(name, size, color);
+    if (!color && ICO_COLORED.has(name)) return `<img class="ico-png" src="/icons-ui/${name}.png" width="${size}" height="${size}" alt="" aria-hidden="true">`;
+    return `<span class="ico-png ico-mask" aria-hidden="true" style="--m:url(/icons-ui/${name}.png);width:${size}px;height:${size}px;background:${color ? (ICO_COL[color] || color) : 'currentColor'}"></span>`;
+  };
   const icoSvg = (name, size = 22, color = null) => `<svg class="ico-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color ? (ICO_COL[color] || color) : 'currentColor'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[name] || ''}</svg>`;
-  const icoEl = (name, size, color) => { const t = document.createElement('template'); t.innerHTML = icoSvg(name, size, color); return t.content.firstChild; };
+  const icoEl = (name, size, color) => { const t = document.createElement('template'); t.innerHTML = icoHtml(name, size, color); return t.content.firstChild; };
