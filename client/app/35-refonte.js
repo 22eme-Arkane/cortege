@@ -9,6 +9,21 @@
     $('#btnList'),                                   // signalements dans la zone
     $('#violenceLink'),                              // signaler une violence policière
     document.querySelector('#sheetRights [data-wipe]')); // tout effacer de ce téléphone
+  // « Enregistrer le son » : aussi dans les actions, visible seulement quand le téléphone sait enregistrer (comme le bouton 🎙️ de la carte)
+  const sonMap = $('#btnSonMap');
+  const sonQuick = el('button', { type: 'button', class: 'tile wide', id: 'btnSonQuick' }, el('span', { class: 'ico', 'aria-hidden': 'true' }, '🎙️'),
+    el('span', {}, el('b', {}, t('Enregistrer le son')), el('small', {}, t('Contrôle, interpellation : une trace sur ton téléphone'))));
+  sonQuick.onclick = () => { closeSheets(); sonMap.click(); };
+  sonQuick.hidden = sonMap.hidden;
+  new MutationObserver(() => { sonQuick.hidden = sonMap.hidden; }).observe(sonMap, { attributes: true, attributeFilter: ['hidden'] });
+  quick.prepend(sonQuick);
+  // « Passer en mode manif » : aussi sur la carte (🚩) et en tête des actions ; le bouton d'origine reste dans Réglages › Pendant la manif
+  const manifQuick = el('button', { type: 'button', class: 'tile wide tile-manif', id: 'btnManifQuick' }, el('span', { class: 'ico', 'aria-hidden': 'true' }, '🚩'),
+    el('span', {}, el('b', {}, t('Passer en mode manif')), el('small', {}, t('Carte, Signaler, SOS et legal team. Rien d’autre.'))));
+  manifQuick.onclick = () => { closeSheets(); $('#btnManif').click(); };
+  quick.prepend(manifQuick);
+  $('#btnManifMap').onclick = () => { closeReport(); closeSheets(); $('#btnManif').click(); };
+  $('#tabActions').onclick = () => $('#btnQuick').onclick();
   $('#btnQuick').onclick = () => { closeReport(); map.closePopup(); const was = !$('#sheetQuick').hidden; closeSheets(); if (!was) $('#sheetQuick').hidden = false; };
   $('#qkClose').onclick = () => closeSheets();
   // « Je suis interpellé·e » reste dans SOS ; « Enregistrer le son » reste sur la carte (🎙️)

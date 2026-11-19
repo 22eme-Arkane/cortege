@@ -58,7 +58,10 @@
     const scope = document.querySelector('input[name="agScope"]:checked').value;
     const c = map.getCenter(), ref = me || [c.lat, c.lng], now = Date.now();
     let list = evCache.e.filter(e => e.start + 3 * 60 * MIN > now);
+    renderFilters2();
+    if (agTypes.size) list = list.filter(e => agTypes.has(e.type));
     renderCal(list);
+    if (agWhen !== 'all') list = list.filter(whenOk);
     if (agSel) list = list.filter(e => dayKey(e.start) === agSel);
     if (scope === 'near') list = list.filter(e => dist(ref, [e.lat, e.lng]) <= 50_000);
     list.sort((a, b) => a.start - b.start);
@@ -76,9 +79,33 @@
   }
   // ---- Calendrier du mois (repris d'Armana) : une pastille par jour qui a un événement, un appui filtre la liste ----
   const dayKey = x => { const d = new Date(x); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
+  // Filtres rapides (repris d'Armana) : « quand » et « quoi » se combinent ; rien n'est gardé d'une ouverture à l'autre
+  let agWhen = 'all';
+  const agTypes = new Set();
+  function whenOk(e) {
+    const d = new Date(), s = new Date(e.start), day0 = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    if (agWhen === 'today') return e.start < day0 + 864e5;
+    if (agWhen === 'week') return e.start < day0 + 7 * 864e5;
+    // Le dimanche, le week-end se réduit à aujourd'hui (leçon d'Armana : le calcul du samedi suivant faisait sauter le jour même)
+    if (agWhen === 'weekend') { const wd = d.getDay(), sat = wd === 0 ? day0 : day0 + (6 - wd) * 864e5, end = wd === 0 ? day0 + 864e5 : sat + 2 * 864e5; return s.getTime() >= Math.min(sat, Date.now()) && e.start < end && (s.getDay() === 6 || s.getDay() === 0); }
+    return true;
+  }
+  function renderFilters2() {
+    const box = $('#agFilters'); if (!box) return; box.textContent = '';
+    const chip = (label, on, fn) => { const b = el('button', { type: 'button', class: 'ag-chip' + (on ? ' on' : ''), 'aria-pressed': String(on) }, label); b.onclick = () => { fn(); agSel = null; renderAgenda(); }; return b; };
+    const row1 = el('div', { class: 'ag-chips' });
+    for (const [k, l] of [['all', 'Tout'], ['today', 'Aujourd’hui'], ['weekend', 'Ce week-end'], ['week', '7 jours']]) row1.append(chip(t(l), agWhen === k, () => { agWhen = k; }));
+    const row2 = el('div', { class: 'ag-chips' });
+    for (const ty of Object.values(EVT)) row2.append(chip(ty.glyph + ' ' + t(ty.label.replace(/ \(.*\)/, '')), agTypes.has(ty.id), () => { agTypes.has(ty.id) ? agTypes.delete(ty.id) : agTypes.add(ty.id); }));
+    box.append(row1, row2);
+  }
   let agSel = null, agMonth = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
+  let calOpen = true;
+  $('#agCalToggle').onclick = () => { calOpen = !calOpen; renderAgenda(); };
   function renderCal(list) {
     const box = $('#agCal'); if (!box) return; box.textContent = '';
+    box.hidden = !calOpen; $('#agCalToggle').setAttribute('aria-expanded', String(calOpen)); $('#agCalToggle').classList.toggle('closed', !calOpen);
+    $('#agCalToggle').setAttribute('aria-label', t(calOpen ? 'Replier le calendrier' : 'Afficher le calendrier'));
     const days = new Map(); for (const e of list) { const k = dayKey(Math.max(e.start, Date.now())); days.set(k, (days.get(k) || 0) + 1); }
     const now = new Date(), first = new Date(now.getFullYear(), now.getMonth(), 1);
     const y = agMonth.getFullYear(), m = agMonth.getMonth();
@@ -103,14 +130,21 @@
   }
   const agDay = (e, now) => e.start < now ? t('En cours') : new Date(e.start).toLocaleDateString(I18N.locale, { weekday: 'long', day: 'numeric', month: 'long' });
   function agRow(e, ref) {
-    const ty = EVT[e.type] || { glyph: '📍' };
-    const btn = el('button', { 'aria-label': e.title },
-      el('span', { class: 'g', style: '--c:var(--accent)' }, ty.glyph),
-      el('span', { class: 't' }, el('div', { class: 'l' }, e.title), el('div', { class: 's' }, `${fmtHour(e.start)} · ${e.place} · ${e.by}`),
-        ordBan?.(e) ? el('div', { class: 's ag-ban' }, '🚫 ' + t('Arrêté en vigueur dans la zone')) : ''),
-      el('span', { class: 'd' }, fmtDist(dist(ref, [e.lat, e.lng]))));
+    const ty = EVT[e.type] || { glyph: '📍', label: '' };
+    const sd = new Date(e.start), ban = ordBan?.(e);
+    const btn = el('button', { class: 'affiche', 'data-type': e.type || 'autre', 'aria-label': e.title },
+      el('span', { class: 'aff-date' },
+        el('small', {}, sd.toLocaleDateString(I18N.locale, { weekday: 'long' })),
+        el('b', {}, String(sd.getDate()).padStart(2, '0')),
+        el('small', { class: 'aff-mois' }, sd.toLocaleDateString(I18N.locale, { month: 'short' }).replace('.', '')),
+        el('span', { class: 'aff-heure' }, fmtHour(e.start))),
+      el('span', { class: 'aff-info' },
+        el('span', { class: 'aff-type' }, ty.glyph + ' ' + t(ty.label)),
+        el('span', { class: 'aff-titre' }, e.title),
+        el('span', { class: 'aff-lieu' }, '📍 ' + e.place + ' · ' + fmtDist(dist(ref, [e.lat, e.lng]))),
+        ban ? el('span', { class: 'aff-ban' }, '🚫 ' + t('Arrêté en vigueur dans la zone')) : el('span', { class: 'aff-by' }, t('Par {who}', { who: e.by }))));
     btn.onclick = () => showEvent(e);
-    return el('li', {}, btn);
+    return el('li', { class: 'aff-li' }, btn);
   }
   // Infos : les 4 prochains événements à moins de 50 km
   function feedAgenda(ref) {

@@ -11,8 +11,9 @@
   const isPage = s => Object.values(PAGES).includes(s);
   function syncTabs() {
     const open = Object.entries(PAGES).find(([, s]) => !$(s).hidden);
+    $('#tabActions')?.toggleAttribute('aria-current', !$('#sheetQuick').hidden);
     for (const id of ['tabMap', ...Object.keys(PAGES)]) {
-      const on = open ? open[0] === id : id === 'tabMap';
+      const on = open ? open[0] === id : id === 'tabMap' && $('#sheetQuick').hidden;
       if (on) $('#' + id).setAttribute('aria-current', 'page'); else $('#' + id).removeAttribute('aria-current');
     }
   }

@@ -4,7 +4,7 @@
   "description": "Carte collaborative en temps réel pour se protéger en manifestation.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#9576a8",
+  "background_color": "#111114",
   "theme_color": "#9576a8",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

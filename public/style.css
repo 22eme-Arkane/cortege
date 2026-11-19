@@ -1112,6 +1112,7 @@ body.medic.md-nosig .leaflet-reports-pane { display: none; }
 .locate-pill[data-state="follow"] { color: var(--accent); border-color: var(--accent); }
 .locate-pill[data-state="searching"] .lp-ico { animation: son-pulse 1.2s ease-in-out infinite; }
 .round.quick-tool { color: #1c1300; background: #ffcf4a; border-color: #ffcf4a; }
+.round.manif-tool { color: #fff; background: #f03c8c; border-color: #f03c8c; }
 .quick-list { display: grid; gap: 10px; }
 .quick-list .violence-btn, .quick-list .wipe-btn, .quick-list .tile { margin: 0; }
 .ev-pin { position: relative; }
@@ -1141,3 +1142,46 @@ body.medic.md-nosig .leaflet-reports-pane { display: none; }
 .rg-back { border: 0; background: none; color: var(--accent); font-weight: 700; font-size: 15px; padding: 4px 0 8px; }
 .rg-title { margin: 0 0 12px; font-size: 20px; }
 .rg-sub > * + * { margin-top: 10px; }
+/* Refonte, 2e passe : 5 places dans la barre (Signaler au centre), filtres et cartes de l'agenda */
+.tabbar { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.ag-filters { display: grid; gap: 8px; margin: 2px 0 10px; }
+.ag-chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.ag-chip { flex: none; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: none; color: var(--fg); font-weight: 600; font-size: 13px; white-space: nowrap; }
+.ag-chip.on { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.ag-cal { max-width: 440px; margin-left: auto; margin-right: auto; }
+.ag-list li { grid-template-columns: 52px 1fr auto; padding: 10px; margin-top: 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.ag-list li.ag-day { display: block; padding: 0; margin-top: 14px; border: 0; background: none; font-weight: 800; text-transform: capitalize; color: var(--muted); font-size: 12.5px; }
+.ag-date { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 50px; height: 54px; border-radius: 12px; background: var(--accent); color: var(--bg); line-height: 1; }
+.ag-date b { font-size: 20px; font-weight: 900; }
+.ag-date small { font-size: 11px; font-weight: 800; text-transform: uppercase; margin-top: 2px; }
+.ag-date i { position: absolute; right: -6px; bottom: -6px; font-style: normal; font-size: 15px; background: var(--surface); border-radius: 50%; width: 24px; height: 24px; display: grid; place-items: center; border: 1px solid var(--line); }
+#sheetAgenda .ag-propose { max-width: 440px; display: block; margin: 4px auto 10px; }
+/* Refonte, 3e passe : Agenda « affiche » repris d'Armana, aux couleurs de Cortège */
+#sheetAgenda .ag-devise { margin: 2px 0 0; color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: .02em; }
+#sheetAgenda .ag-filters { padding: 8px; border-radius: 18px; background: color-mix(in srgb, var(--surface) 70%, transparent); border: 1px solid var(--line); }
+.ag-cal[hidden] { display: none; }
+.ag-cal-toggle { display: grid; place-items: center; width: 40px; height: 28px; margin: -6px auto 6px; border-radius: 0 0 14px 14px; border: 1px solid var(--line); border-top: 0; background: var(--surface); color: var(--accent); }
+.ag-cal-toggle.closed svg { transform: rotate(180deg); }
+.ag-list li.aff-li { display: block; padding: 0; border: 0; background: none; margin-top: 10px; }
+.affiche { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 34% 1fr; width: 100%; height: 132px; border-radius: 12px; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--line); --tone: var(--accent); --ink: #12122a; }
+.affiche[data-type="manif"] { --tone: #f03c8c; --ink: #fff; }
+.affiche[data-type="blocus"] { --tone: #ff9f1c; --ink: #1b1200; }
+.affiche[data-type="rassemblement"] { --tone: #5b8cff; --ink: #fff; }
+.affiche[data-type="ag"] { --tone: #30a46c; --ink: #fff; }
+.affiche:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.aff-date { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding-right: 12px;
+  background: var(--tone); color: var(--ink); clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%); }
+.aff-date::after { content: ''; position: absolute; right: -24px; bottom: -40px; width: 84px; height: 84px; border-radius: 50%; background: rgba(255,255,255,.14); }
+.aff-date small { font-family: var(--font-display); text-transform: uppercase; font-size: 12px; letter-spacing: .04em; line-height: 1; }
+.aff-date b { font-family: var(--font-display); font-size: 44px; line-height: 1; font-weight: 400; }
+.aff-date .aff-mois { font-size: 16px; }
+.aff-heure { margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: rgba(0,0,0,.28); color: #fff; font-size: 11.5px; font-weight: 800; font-family: var(--font-num); }
+.aff-info { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; padding: 10px 12px 10px 6px; }
+.aff-type { color: var(--tone); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.aff-titre { font-family: var(--font-display); font-size: 21px; line-height: 1.05; text-transform: uppercase; color: var(--fg);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.aff-lieu, .aff-by { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aff-ban { color: var(--fdo-strong); font-size: 12px; font-weight: 800; }
+.list li button.affiche { display: grid; grid-template-columns: 34% 1fr; cursor: pointer; }
+#sheetAgenda .ag-list li.ag-day { display: none !important; }

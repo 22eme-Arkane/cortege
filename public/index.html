@@ -114,6 +114,7 @@
 <div class="tools tools-left">
   <button class="round orga-tool" id="btnOrga" hidden title="Espace orga" aria-label="Espace orga">📣</button>
   <button class="round idea-tool" id="btnIdeaVote" hidden title="Idées au vote" aria-label="Idées au vote"><span aria-hidden="true">💡</span><span class="idea-badge" id="ideaBadgeMap" hidden></span></button>
+  <button class="round manif-tool" id="btnManifMap" title="Passer en mode manif" aria-label="Passer en mode manif"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg></button>
   <button class="round quick-tool" id="btnQuick" title="Actions rapides" aria-label="Actions rapides" aria-controls="sheetQuick"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg></button>
   <button class="round sos" id="btnSos" title="Interpellation : prévenir un proche" aria-label="Interpellation : prévenir un proche">SOS</button>
 </div>
@@ -150,6 +151,10 @@
   <button type="button" class="tab" id="tabRights" aria-controls="sheetRights" hidden>
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg>
     <span>Droits</span>
+  </button>
+  <button type="button" class="tab" id="tabActions" aria-controls="sheetQuick">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg>
+    <span>Actions</span>
   </button>
   <button type="button" class="tab" id="tabMore" aria-controls="sheetInfo">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>
@@ -821,12 +826,14 @@
 
 <section class="sheet page" id="sheetAgenda" hidden aria-labelledby="agTitle">
   <div class="sheet-head">
-    <h2 id="agTitle">Agenda</h2>
+    <div><h2 id="agTitle">Agenda</h2><p class="ag-devise">Les mobilisations à venir</p></div>
     <button class="x" id="agClose" aria-label="Fermer">×</button>
   </div>
   <button class="install ag-propose" id="btnPropose">＋ Annoncer une manif</button>
   <div id="agNow" class="ag-now"></div>
+  <div class="ag-filters" id="agFilters"></div>
   <div class="ag-cal" id="agCal"></div>
+  <button type="button" class="ag-cal-toggle" id="agCalToggle" aria-expanded="true" aria-label="Replier le calendrier"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></button>
   <fieldset class="seg" aria-label="Zone" hidden>
     <label><input type="radio" name="agScope" value="near"> Près de toi (50 km)</label>
     <label><input type="radio" name="agScope" value="all" checked> Toute la France</label>
