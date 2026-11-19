@@ -1212,4 +1212,8 @@ body.medic.md-nosig .leaflet-reports-pane { display: none; }
 #btnReport .tr-ico.tr-ico-png { background: var(--nav-bg, #0f1230) !important; border: 0; box-shadow: 0 4px 16px rgba(240, 60, 140, .45); }
 #btnReport .tr-ico.tr-ico-png .ico-png { width: 54px; height: 54px; }
 .tab .ico-png { width: 26px; height: 26px; }
+.round.sos.sos-png { background: var(--nav-bg, #0f1230); border-color: #cf3036; padding: 0; }
+.legal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.legal-head .legal-title { margin-bottom: 0; }
+.pin .ico-png, .cat .g .ico-png { display: inline-block; }
 #btnReport.active .tr-ico.tr-ico-png { transform: none; box-shadow: 0 0 0 3px #f03c8c; }

@@ -141,7 +141,7 @@
   let famOpen = null, famPick = { n: null, d: undefined }; // famille ouverte ; nombre et direction choisis avant l'envoi
   function catBtn(id, onPick) {
     const c = CAT[id];
-    const b = el('button', { type: 'button', class: 'cat', 'data-cat': id, style: `--c:${GROUP_COLOR[c.group]}` }, el('span', { class: 'g', 'aria-hidden': 'true' }, c.glyph), c.label, el('span', { class: 'sub' }));
+    const b = el('button', { type: 'button', class: 'cat', 'data-cat': id, style: `--c:${GROUP_COLOR[c.group]}` }, el('span', { class: 'g', 'aria-hidden': 'true' }, CAT_ICO[id] ? icoEl(CAT_ICO[id], 22, '#fff') : c.glyph), c.label, el('span', { class: 'sub' }));
     b.onclick = () => onPick(id);
     return b;
   }

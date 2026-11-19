@@ -51,7 +51,7 @@
     const cls = ['pin', fresh ? 'fresh' : '', age > ttl * 0.6 ? 'old' : '', r.c ? 'contested' : '', cs ? 'calm-' + cs.lvl : ''].join(' ');
     return L.divIcon({ className: '', iconSize: [40, 40], iconAnchor: [20, 20], popupAnchor: [0, -18],
       html: r.cat === 'contact' ? `<div class="pin admin live" style="--c:#a191d8"><img src="/brand/logo.png" alt=""></div>`
-        : `<div class="${cls}${r.ver ? ' ver' : ''}${r.live ? ' live' : ''}" style="--c:${GROUP_COLOR[c.group]}">${c.glyph}${dirOf(r) != null ? `<i class="pin-dir" style="--d:${dirOf(r)}deg" aria-hidden="true"></i>` : ''}</div>` });
+        : `<div class="${cls}${r.ver ? ' ver' : ''}${r.live ? ' live' : ''}" style="--c:${GROUP_COLOR[c.group]}">${catIco(c)}${dirOf(r) != null ? `<i class="pin-dir" style="--d:${dirOf(r)}deg" aria-hidden="true"></i>` : ''}</div>` });
   }
   function popup(r) {
     const c = CAT[r.cat];
@@ -191,7 +191,7 @@
   const sev = r => SEVERITY.indexOf(CAT[r.cat].group);
   const markerOf = id => { const k = stackOf.get(id); return k ? stacks.get(k)?.marker : reports.get(id)?.marker; };
   function stackIcon(g) {
-    const glyphs = g.slice(0, 3).map(r => `<span>${CAT[r.cat].glyph}</span>`).join('') + (g.length > 3 ? `<b>+${g.length - 3}</b>` : '');
+    const glyphs = g.slice(0, 3).map(r => `<span>${catIco(CAT[r.cat], 16)}</span>`).join('') + (g.length > 3 ? `<b>+${g.length - 3}</b>` : '');
     const fresh = g.some(r => Date.now() - (r.last || r.t) < CAT[r.cat].ttl * MIN * 0.6);
     return L.divIcon({ className: '', iconSize: [30 + 20 * Math.min(g.length, 3), 40], iconAnchor: [15 + 10 * Math.min(g.length, 3), 20], popupAnchor: [0, -18],
       html: `<div class="pin stack${fresh ? '' : ' old'}${g.some(r => r.ver) ? ' ver' : ''}" style="--c:${GROUP_COLOR[CAT[g[0].cat].group]}">${glyphs}</div>` });

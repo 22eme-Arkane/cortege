@@ -45,4 +45,7 @@
     return `<span class="ico-png ico-mask" aria-hidden="true" style="--m:url(/icons-ui/${name}.png);width:${size}px;height:${size}px;background:${color ? (ICO_COL[color] || color) : 'currentColor'}"></span>`;
   };
   const icoSvg = (name, size = 22, color = null) => `<svg class="ico-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color ? (ICO_COL[color] || color) : 'currentColor'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[name] || ''}</svg>`;
+  // Catégories de signalement qui ont leur icône sur la planche : en blanc sur la pastille colorée de la carte
+  const CAT_ICO = { medic: 'medic', legal: 'legal', calme: 'zone-calme' };
+  const catIco = (c, size = 20) => (c && CAT_ICO[c.id] ? icoHtml(CAT_ICO[c.id], size, '#fff') : c ? c.glyph : '');
   const icoEl = (name, size, color) => { const t = document.createElement('template'); t.innerHTML = icoHtml(name, size, color); return t.content.firstChild; };

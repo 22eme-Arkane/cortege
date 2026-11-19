@@ -244,6 +244,9 @@
     return `<span class="ico-png ico-mask" aria-hidden="true" style="--m:url(/icons-ui/${name}.png);width:${size}px;height:${size}px;background:${color ? (ICO_COL[color] || color) : 'currentColor'}"></span>`;
   };
   const icoSvg = (name, size = 22, color = null) => `<svg class="ico-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color ? (ICO_COL[color] || color) : 'currentColor'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[name] || ''}</svg>`;
+  // Catégories de signalement qui ont leur icône sur la planche : en blanc sur la pastille colorée de la carte
+  const CAT_ICO = { medic: 'medic', legal: 'legal', calme: 'zone-calme' };
+  const catIco = (c, size = 20) => (c && CAT_ICO[c.id] ? icoHtml(CAT_ICO[c.id], size, '#fff') : c ? c.glyph : '');
   const icoEl = (name, size, color) => { const t = document.createElement('template'); t.innerHTML = icoHtml(name, size, color); return t.content.firstChild; };
   // ---- Utilitaires ----
   const ago = x => { const m = Math.round((Date.now() - x) / MIN); return m < 1 ? t('à l’instant') : t('il y a {m} min', { m }); };
@@ -387,7 +390,7 @@
     const cls = ['pin', fresh ? 'fresh' : '', age > ttl * 0.6 ? 'old' : '', r.c ? 'contested' : '', cs ? 'calm-' + cs.lvl : ''].join(' ');
     return L.divIcon({ className: '', iconSize: [40, 40], iconAnchor: [20, 20], popupAnchor: [0, -18],
       html: r.cat === 'contact' ? `<div class="pin admin live" style="--c:#a191d8"><img src="/brand/logo.png" alt=""></div>`
-        : `<div class="${cls}${r.ver ? ' ver' : ''}${r.live ? ' live' : ''}" style="--c:${GROUP_COLOR[c.group]}">${c.glyph}${dirOf(r) != null ? `<i class="pin-dir" style="--d:${dirOf(r)}deg" aria-hidden="true"></i>` : ''}</div>` });
+        : `<div class="${cls}${r.ver ? ' ver' : ''}${r.live ? ' live' : ''}" style="--c:${GROUP_COLOR[c.group]}">${catIco(c)}${dirOf(r) != null ? `<i class="pin-dir" style="--d:${dirOf(r)}deg" aria-hidden="true"></i>` : ''}</div>` });
   }
   function popup(r) {
     const c = CAT[r.cat];
@@ -527,7 +530,7 @@
   const sev = r => SEVERITY.indexOf(CAT[r.cat].group);
   const markerOf = id => { const k = stackOf.get(id); return k ? stacks.get(k)?.marker : reports.get(id)?.marker; };
   function stackIcon(g) {
-    const glyphs = g.slice(0, 3).map(r => `<span>${CAT[r.cat].glyph}</span>`).join('') + (g.length > 3 ? `<b>+${g.length - 3}</b>` : '');
+    const glyphs = g.slice(0, 3).map(r => `<span>${catIco(CAT[r.cat], 16)}</span>`).join('') + (g.length > 3 ? `<b>+${g.length - 3}</b>` : '');
     const fresh = g.some(r => Date.now() - (r.last || r.t) < CAT[r.cat].ttl * MIN * 0.6);
     return L.divIcon({ className: '', iconSize: [30 + 20 * Math.min(g.length, 3), 40], iconAnchor: [15 + 10 * Math.min(g.length, 3), 20], popupAnchor: [0, -18],
       html: `<div class="pin stack${fresh ? '' : ' old'}${g.some(r => r.ver) ? ' ver' : ''}" style="--c:${GROUP_COLOR[CAT[g[0].cat].group]}">${glyphs}</div>` });
@@ -1592,7 +1595,7 @@
   let famOpen = null, famPick = { n: null, d: undefined }; // famille ouverte ; nombre et direction choisis avant l'envoi
   function catBtn(id, onPick) {
     const c = CAT[id];
-    const b = el('button', { type: 'button', class: 'cat', 'data-cat': id, style: `--c:${GROUP_COLOR[c.group]}` }, el('span', { class: 'g', 'aria-hidden': 'true' }, c.glyph), c.label, el('span', { class: 'sub' }));
+    const b = el('button', { type: 'button', class: 'cat', 'data-cat': id, style: `--c:${GROUP_COLOR[c.group]}` }, el('span', { class: 'g', 'aria-hidden': 'true' }, CAT_ICO[id] ? icoEl(CAT_ICO[id], 22, '#fff') : c.glyph), c.label, el('span', { class: 'sub' }));
     b.onclick = () => onPick(id);
     return b;
   }
@@ -3465,6 +3468,10 @@
   for (const w of document.querySelectorAll('[data-wipe] .wipe-txt b')) w.prepend(icoEl('effacer', 17), ' ');
   { const p = $('#btnPropose'); p.textContent = ''; p.append(icoEl('annoncer', 19), ' ' + t(orga ? 'Publier une manif ou un blocus' : 'Annoncer une manif')); p.classList.add('btn-ico'); }
   { const o = $('#btnOrders'); if (o) { o.prepend(icoEl('arretes', 18), ' '); o.classList.add('btn-ico'); } }
+  // SOS (carte et mode manif), legal team (Mes droits), partager (Faire grandir)
+  { const s = $('#btnSos'); s.textContent = ''; s.append(icoEl('sos', 44)); s.classList.add('sos-png'); }
+  { const lt = $('#legalTitle'); if (lt) { const row = el('div', { class: 'legal-head' }, icoEl('legal', 26)); lt.before(row); row.append(lt); } }
+  setTileIco($('#btnShare'), 'partager');
   const RG_ICO = { manif: 'drapeau', avant: 'sac', droits: 'droits', grandir: 'grandir', apparence: 'apparence', securite: 'securite', soutenir: 'soutenir', apropos: 'apropos' };
   SECTIONS.forEach((s, i) => {
     const row = menu.children[i], ico = row.querySelector('.rg-ico'); ico.textContent = ''; ico.append(icoEl(RG_ICO[s.k], 24, s.k === 'soutenir' ? 'pink' : null));

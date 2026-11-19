@@ -111,6 +111,10 @@
   for (const w of document.querySelectorAll('[data-wipe] .wipe-txt b')) w.prepend(icoEl('effacer', 17), ' ');
   { const p = $('#btnPropose'); p.textContent = ''; p.append(icoEl('annoncer', 19), ' ' + t(orga ? 'Publier une manif ou un blocus' : 'Annoncer une manif')); p.classList.add('btn-ico'); }
   { const o = $('#btnOrders'); if (o) { o.prepend(icoEl('arretes', 18), ' '); o.classList.add('btn-ico'); } }
+  // SOS (carte et mode manif), legal team (Mes droits), partager (Faire grandir)
+  { const s = $('#btnSos'); s.textContent = ''; s.append(icoEl('sos', 44)); s.classList.add('sos-png'); }
+  { const lt = $('#legalTitle'); if (lt) { const row = el('div', { class: 'legal-head' }, icoEl('legal', 26)); lt.before(row); row.append(lt); } }
+  setTileIco($('#btnShare'), 'partager');
   const RG_ICO = { manif: 'drapeau', avant: 'sac', droits: 'droits', grandir: 'grandir', apparence: 'apparence', securite: 'securite', soutenir: 'soutenir', apropos: 'apropos' };
   SECTIONS.forEach((s, i) => {
     const row = menu.children[i], ico = row.querySelector('.rg-ico'); ico.textContent = ''; ico.append(icoEl(RG_ICO[s.k], 24, s.k === 'soutenir' ? 'pink' : null));
